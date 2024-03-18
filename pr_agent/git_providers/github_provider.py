@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from github import AppAuthentication, Auth, Github, GithubException
 from retry import retry
 from starlette_context import context
-
+from dynaconf.vendor.box.exceptions import BoxKeyError
 from ..algo.language_handler import is_valid_file
 from ..algo.utils import load_large_diff, clip_tokens, find_line_number_of_relevant_line_in_file
 from ..config_loader import get_settings
@@ -19,11 +19,33 @@ from pr_agent.algo.types import EDIT_TYPE, FilePatchInfo
 
 class GithubProvider(GitProvider):
     def __init__(self, pr_url: Optional[str] = None, incremental=IncrementalPR(False)):
+
         self.repo_obj = None
+
+        # We check for the installation id via the starlette context and
+        # fallback on local configuration settings.
         try:
             self.installation_id = context.get("installation_id", None)
+
         except Exception:
             self.installation_id = None
+
+        # When running locally, the app installation ID can be set in
+        # .secrets.toml (this is the ID assigned each time an app is
+        # installed on a specific github repo or org). This is necessary
+        # b/c there is no starlette context unless running via github action.
+        if self.installation_id is None:
+            try:
+                self.installation_id =  get_settings().github.installation_id
+
+            except BoxKeyError:
+                # There's nothing left to try for so we ignore key errors .
+                pass
+
+        # Ensure the ID is an integer.
+        if self.installation_id is not None:
+            self.installation_id = int(self.installation_id)
+
         self.base_url = get_settings().get("GITHUB.BASE_URL", "https://api.github.com").rstrip("/")
         self.base_url_html = self.base_url.split("api/")[0].rstrip("/") if "api/" in self.base_url else "https://github.com"
         self.github_client = self._get_github_client()
