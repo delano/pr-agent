@@ -46,6 +46,8 @@ class PRReviewer:
         if self.is_answer and not self.git_provider.is_supported("get_issue_comments"):
             raise Exception(f"Answer mode is not supported for {get_settings().config.git_provider} for now")
         self.ai_handler = ai_handler()
+        self.ai_handler.main_pr_language = self.main_language
+
         self.patches_diff = None
         self.prediction = None
 
@@ -56,10 +58,11 @@ class PRReviewer:
             "description": self.git_provider.get_pr_description(),
             "language": self.main_language,
             "diff": "",  # empty diff for initial calculation
+            "num_pr_files": self.git_provider.get_num_of_files(),
             "require_score": get_settings().pr_reviewer.require_score_review,
             "require_tests": get_settings().pr_reviewer.require_tests_review,
-            "require_focused": get_settings().pr_reviewer.require_focused_review,
             "require_estimate_effort_to_review": get_settings().pr_reviewer.require_estimate_effort_to_review,
+            'require_can_be_split_review': get_settings().pr_reviewer.require_can_be_split_review,
             'num_code_suggestions': get_settings().pr_reviewer.num_code_suggestions,
             'question_str': question_str,
             'answer_str': answer_str,
@@ -370,6 +373,8 @@ class PRReviewer:
                         review_labels.append('Possible security concern')
 
                 current_labels = self.git_provider.get_pr_labels(update=True)
+                if not current_labels:
+                    current_labels = []
                 get_logger().debug(f"Current labels:\n{current_labels}")
                 if current_labels:
                     current_labels_filtered = [label for label in current_labels if

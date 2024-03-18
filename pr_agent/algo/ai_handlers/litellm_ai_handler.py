@@ -36,6 +36,8 @@ class LiteLLMAIHandler(BaseAiHandler):
             assert litellm_token, "LITELLM_TOKEN is required"
             os.environ["LITELLM_TOKEN"] = litellm_token
             litellm.use_client = True
+        if get_settings().get("LITELLM.DROP_PARAMS", None):
+            litellm.drop_params = get_settings().litellm.drop_params
         if get_settings().get("OPENAI.ORG", None):
             litellm.organization = get_settings().openai.org
         if get_settings().get("OPENAI.API_TYPE", None):
@@ -68,10 +70,23 @@ class LiteLLMAIHandler(BaseAiHandler):
             )
         if get_settings().get("AWS.BEDROCK_REGION", None):
             litellm.AmazonAnthropicConfig.max_tokens_to_sample = 2000
+            litellm.AmazonAnthropicClaude3Config.max_tokens = 2000
             self.aws_bedrock_client = boto3.client(
                 service_name="bedrock-runtime",
                 region_name=get_settings().aws.bedrock_region,
             )
+
+    def prepare_logs(self, response, system, user, resp, finish_reason):
+        response_log = response.dict().copy()
+        response_log['system'] = system
+        response_log['user'] = user
+        response_log['output'] = resp
+        response_log['finish_reason'] = finish_reason
+        if hasattr(self, 'main_pr_language'):
+            response_log['main_pr_language'] = self.main_pr_language
+        else:
+            response_log['main_pr_language'] = 'unknown'
+        return response_log
 
     @property
     def deployment_id(self):
@@ -125,10 +140,13 @@ class LiteLLMAIHandler(BaseAiHandler):
         else:
             resp = response["choices"][0]['message']['content']
             finish_reason = response["choices"][0]["finish_reason"]
-            # usage = response.get("usage")
             get_logger().debug(f"\nAI response:\n{resp}")
-            get_logger().debug("Full_response", artifact=response)
 
+            # log the full response for debugging
+            response_log = self.prepare_logs(response, system, user, resp, finish_reason)
+            get_logger().debug("Full_response", artifact=response_log)
+
+            # for CLI debugging
             if get_settings().config.verbosity_level >= 2:
                 get_logger().info(f"\nAI response:\n{resp}")
 
