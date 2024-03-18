@@ -13,7 +13,7 @@ use_global_settings_file=true
 ai_timeout=120 # 2minutes
 max_description_tokens = 500
 max_commits_tokens = 500
-max_model_tokens = 32000 # Limits the maximum number of tokens that can be used by any model, regardless of the model's default capabilities.
+max_model_tokens = 128000 # Limits the maximum number of tokens that can be used by any model, regardless of the model's default capabilities.
 patch_extra_lines = 1
 secret_provider="google_cloud_storage"
 cli_mode=false
@@ -122,7 +122,7 @@ enable_help_text=true
 
 [github]
 # The type of deployment to create. Valid values are 'app' or 'user'.
-deployment_type = "user"
+deployment_type = "app"
 ratelimit_retries = 5
 base_url = "https://api.github.com"
 publish_inline_comments_fallback_with_verification = true
