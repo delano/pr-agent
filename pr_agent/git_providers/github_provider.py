@@ -1,20 +1,24 @@
-import time
 import hashlib
+import time
 from datetime import datetime
 from typing import Optional, Tuple
 from urllib.parse import urlparse
 
+from dynaconf.vendor.box.exceptions import BoxKeyError
 from github import AppAuthentication, Auth, Github, GithubException
 from retry import retry
 from starlette_context import context
-from dynaconf.vendor.box.exceptions import BoxKeyError
+
+from pr_agent.algo.types import EDIT_TYPE, FilePatchInfo
+
 from ..algo.language_handler import is_valid_file
-from ..algo.utils import load_large_diff, clip_tokens, find_line_number_of_relevant_line_in_file
+from ..algo.utils import (clip_tokens,
+                          find_line_number_of_relevant_line_in_file,
+                          load_large_diff)
 from ..config_loader import get_settings
 from ..log import get_logger
 from ..servers.utils import RateLimitExceeded
 from .git_provider import GitProvider, IncrementalPR
-from pr_agent.algo.types import EDIT_TYPE, FilePatchInfo
 
 
 class GithubProvider(GitProvider):
@@ -597,7 +601,7 @@ class GithubProvider(GitProvider):
 
     def _get_github_client(self):
         deployment_type = get_settings().get("GITHUB.DEPLOYMENT_TYPE", "user")
-
+        # deployment_type = "user"
         if deployment_type == 'app':
             try:
                 private_key = get_settings().github.private_key

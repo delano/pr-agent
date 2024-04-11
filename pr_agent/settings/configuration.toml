@@ -1,11 +1,11 @@
 [config]
 # model="gpt-4" # "gpt-4-0125-preview"
-model = "claude-3-opus-20240229"
-model_turbo = "claude-3-sonnet-20240229"
+model = "claude-3-sonnet-20240229"
+model_turbo = "claude-3-haiku-20240307"
 # model_turbo = "gpt-4-0125-preview"
 fallback_models = [
-    "claude-3-haiku-20240307",
     "gpt-4-0125-preview",
+    "gpt-3.5-turbo-16k",
 ] #"gpt-4", "gpt-3.5-turbo-16k"]
 git_provider = "github"
 publish_output = true
@@ -64,11 +64,11 @@ use_bullet_points = true
 extra_instructions = ""
 enable_pr_type = true
 final_update_message = true
-enable_help_text=false
-enable_help_comment=true
+enable_help_text = false
+enable_help_comment = true
 # describe as comment
-publish_description_as_comment=false
-publish_description_as_comment_persistent=true
+publish_description_as_comment = false
+publish_description_as_comment_persistent = true
 ## changes walkthrough section
 enable_semantic_files_types = true
 collapsible_file_list = 'adaptive' # true, false, 'adaptive'
@@ -90,7 +90,7 @@ summarize = true
 extra_instructions = ""
 rank_suggestions = false
 enable_help_text = true
-persistent_comment=false
+persistent_comment = false
 # params for '/improve --extended' mode
 auto_extended_mode = true
 num_code_suggestions_per_chunk = 5
@@ -119,11 +119,11 @@ class_name = ""         # in case there are several methods with the same name i
 enable_help_text = true
 
 [pr_improve_component] # /improve_component #
-num_code_suggestions=4
+num_code_suggestions = 4
 extra_instructions = ""
-file = ""              # in case there are several components with the same name, you can specify the relevant file
-class_name = ""        # in case there are several methods with the same name in the same file, you can specify the relevant class name
-enable_help_text=true
+file = ""                # in case there are several components with the same name, you can specify the relevant file
+class_name = ""          # in case there are several methods with the same name in the same file, you can specify the relevant class name
+enable_help_text = true
 
 [checks] # /checks (pro feature) #
 enable_auto_checks_feedback = true
@@ -139,7 +139,7 @@ enable_help_text = true
 
 [github]
 # The type of deployment to create. Valid values are 'app' or 'user'.
-deployment_type = "app"
+# deployment_type = "user"
 ratelimit_retries = 5
 base_url = "https://api.github.com"
 publish_inline_comments_fallback_with_verification = true
@@ -152,7 +152,7 @@ try_fix_invalid_inline_comments = true
 
 [github_app]
 # these toggles allows running the github app from custom deployments
-override_deployment_type = true
+override_deployment_type = false
 # settings for "pull_request" event
 handle_pr_actions = ['opened', 'reopened', 'ready_for_review']
 pr_commands = [

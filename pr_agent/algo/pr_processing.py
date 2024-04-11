@@ -5,14 +5,13 @@ from typing import Callable, List, Tuple
 
 from github import RateLimitExceededException
 
+from pr_agent.algo.file_filter import filter_ignored
 from pr_agent.algo.git_patch_processing import convert_to_hunks_with_lines_numbers, extend_patch, handle_patch_deletions
 from pr_agent.algo.language_handler import sort_files_by_main_languages
-from pr_agent.algo.file_filter import filter_ignored
 from pr_agent.algo.token_handler import TokenHandler
-from pr_agent.algo.utils import get_max_tokens, ModelType
-from pr_agent.config_loader import get_settings
-from pr_agent.git_providers.git_provider import GitProvider
 from pr_agent.algo.types import EDIT_TYPE, FilePatchInfo
+from pr_agent.algo.utils import ModelType, get_max_tokens
+from pr_agent.config_loader import get_settings
 from pr_agent.log import get_logger
 
 DELETED_FILES_ = "Deleted files:\n"
@@ -247,6 +246,7 @@ async def retry_with_fallback_models(f: Callable, model_type: ModelType = ModelT
     all_deployments = _get_all_deployments(all_models)
     # try each (model, deployment_id) pair until one is successful, otherwise raise exception
     for i, (model, deployment_id) in enumerate(zip(all_models, all_deployments)):
+
         try:
             get_logger().debug(
                 f"Generating prediction with {model}"
@@ -254,7 +254,8 @@ async def retry_with_fallback_models(f: Callable, model_type: ModelType = ModelT
             )
             get_settings().set("openai.deployment_id", deployment_id)
             return await f(model)
-        except:
+        except Exception as e:
+            get_logger().info(f"POO: {e}")
             get_logger().warning(
                 f"Failed to generate prediction with {model}"
                 f"{(' from deployment ' + deployment_id) if deployment_id else ''}: "
