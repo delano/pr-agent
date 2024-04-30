@@ -1,8 +1,9 @@
 MAX_TOKENS = {
     'text-embedding-ada-002': 8000,
-    'gpt-3.5-turbo': 4000,
+    'gpt-3.5-turbo': 16000,
+    'gpt-3.5-turbo-0125': 16000,
     'gpt-3.5-turbo-0613': 4000,
-    'gpt-3.5-turbo-0301': 4000,
+    'gpt-3.5-turbo-1106': 16000,
     'gpt-3.5-turbo-16k': 16000,
     'gpt-3.5-turbo-16k-0613': 16000,
     'gpt-4': 8000,
@@ -37,4 +38,6 @@ MAX_TOKENS = {
     'bedrock/anthropic.claude-v2:1': 100000,
     'bedrock/anthropic.claude-3-sonnet-20240229-v1:0': 100000,
     'bedrock/anthropic.claude-3-haiku-20240307-v1:0': 100000,
+    'groq/llama3-8b-8192': 8192,
+    'groq/llama3-70b-8192': 8192,
 }

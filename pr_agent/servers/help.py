@@ -68,10 +68,9 @@ some_config2=...
         output += """\
 - When you first install the app, the [default mode](https://pr-agent-docs.codium.ai/usage-guide/automations_and_usage/#github-app-automatic-tools-when-a-new-pr-is-opened) for the describe tool is:
 ```
-pr_commands = ["/describe --pr_description.add_original_user_description=true" 
-                         "--pr_description.keep_original_user_title=true", ...]
+pr_commands = ["/describe", ...]
 ```
-meaning the `describe` tool will run automatically on every PR, will keep the original title, and will add the original user description above the generated description. 
+meaning the `describe` tool will run automatically on every PR.
 
 - Markers are an alternative way to control the generated description, to give maximal control to the user. If you set:
 ```
@@ -160,16 +159,17 @@ It can be invoked manually by commenting on any PR:
 /ask "..."
 ```
 
-Note that the tool does not have "memory" of previous questions, and answers each question independently.        
+Note that the tool does not have "memory" of previous questions, and answers each question independently.   
+You can ask questions about the entire PR, about specific code lines, or about an image related to the PR code changes.     
         """
-        output += "\n\n<table>"
-
-        # general
-        output += "\n\n<tr><td><details> <summary><strong> More PR-Agent commands</strong></summary><hr> \n\n"
-        output += HelpMessage.get_general_bot_help_text()
-        output += "\n\n</details></td></tr>\n\n"
-
-        output += "</table>"
+        # output += "\n\n<table>"
+        #
+        # # # general
+        # # output += "\n\n<tr><td><details> <summary><strong> More PR-Agent commands</strong></summary><hr> \n\n"
+        # # output += HelpMessage.get_general_bot_help_text()
+        # # output += "\n\n</details></td></tr>\n\n"
+        #
+        # output += "</table>"
 
         output += f"\n\nSee the [ask usage](https://pr-agent-docs.codium.ai/tools/ask/) page for a comprehensive guide on using this tool.\n\n"
 

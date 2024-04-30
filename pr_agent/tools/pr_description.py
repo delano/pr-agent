@@ -302,7 +302,7 @@ class PRDescription:
 
         # Remove the 'PR Title' key from the dictionary
         ai_title = self.data.pop('title', self.vars["title"])
-        if get_settings().pr_description.keep_original_user_title:
+        if (not get_settings().pr_description.generate_ai_title):
             # Assign the original PR title to the 'title' variable
             title = self.vars["title"]
         else:

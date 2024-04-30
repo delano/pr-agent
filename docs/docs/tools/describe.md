@@ -6,21 +6,45 @@ The tool can be triggered automatically every time a new PR is [opened](../usage
 /describe
 ```
 
-For example:
+## Example usage
+
+### Manual triggering
+
+Invoke the tool manually by commenting `/describe` on any PR:
 
 ![Describe comment](https://codium.ai/images/pr_agent/describe_comment.png){width=512}
 
+After ~30 seconds, the tool will generate a description for the PR:
+
 ![Describe New](https://codium.ai/images/pr_agent/describe_new.png){width=512}
 
-
-  
-## Configuration options
-
-### General configurations
-To edit [configurations](https://github.com/Codium-ai/pr-agent/blob/main/pr_agent/settings/configuration.toml#L46) related to the describe tool (`pr_description` section), use the following template:
+If you want to edit [configurations](#configuration-options), add the relevant ones to the command:
 ```
 /describe --pr_description.some_config1=... --pr_description.some_config2=...
 ```
+
+### Automatic triggering
+
+To run the `describe` automatically when a PR is opened, define in a [configuration file](https://pr-agent-docs.codium.ai/usage-guide/configuration_options/#wiki-configuration-file):
+```
+[github_app]
+pr_commands = [
+    "/describe",
+    ...
+]
+
+[pr_description]
+publish_labels = ...
+...
+```
+
+- The `pr_commands` lists commands that will be executed automatically when a PR is opened.
+- The `[pr_description]` section contains the configurations for the `describe` tool you want to edit (if any).
+
+
+## Configuration options
+
+### General configurations
 
 !!! example "Possible configurations"
 
@@ -32,7 +56,7 @@ To edit [configurations](https://github.com/Codium-ai/pr-agent/blob/main/pr_agen
 
     - `add_original_user_description`: if set to true, the tool will add the original user description to the generated description. Default is true.
 
-    - `keep_original_user_title`: if set to true, the tool will keep the original PR title, and won't change it. Default is true.
+    - `generate_ai_title`: if set to true, the tool will also generate an AI title for the PR. Default is false.
 
     - `extra_instructions`: Optional extra instructions to the tool. For example: "focus on the changes in the file X. Ignore change in ...".
 
@@ -144,25 +168,18 @@ The description should be comprehensive and detailed, indicating when to add the
 !!! tip "Automation"
     - When you first install PR-Agent app, the [default mode](../usage-guide/automations_and_usage.md#github-app) for the describe tool is:
     ```
-    pr_commands = ["/describe --pr_description.add_original_user_description=true" 
-                             "--pr_description.keep_original_user_title=true", ...]
+    pr_commands = ["/describe", ...]
     ```
-    meaning the `describe` tool will run automatically on every PR, will keep the original title, and will add the original user description above the generated description. 
-    <br> This default settings aim to strike a good balance between automation and control:
-        - If you want more automation, just give the PR a title, and the tool will auto-write a full description; If you want more control, you can add a detailed description, and the tool will add the complementary description below it.
-        - For maximal automation, you can change the default mode to:
-        ```
-        pr_commands = ["/describe --pr_description.add_original_user_description=false" 
-                                 "--pr_description.keep_original_user_title=true", ...]
-        ```
-        so the title will be auto-generated as well.
-    - Markers are an alternative way to control the generated description, to give maximal control to the user. If you set:
-    ```
-    pr_commands = ["/describe --pr_description.use_description_markers=true", ...]
-    ```
-    the tool will replace every marker of the form `pr_agent:marker_name` in the PR description with the relevant content, where `marker_name` is one of the following:
-          * `type`: the PR type.
-          * `summary`: the PR summary.
-          * `walkthrough`: the PR walkthrough.
+    meaning the `describe` tool will run automatically on every PR, with the default configurations. 
 
-    - Note that when markers are enabled, if the original PR description does not contain any markers, the tool will not alter the description at all.
+
+   - Markers are an alternative way to control the generated description, to give maximal control to the user. If you set:
+   ```
+   pr_commands = ["/describe --pr_description.use_description_markers=true", ...]
+   ```
+   the tool will replace every marker of the form `pr_agent:marker_name` in the PR description with the relevant content, where `marker_name` is one of the following:
+         * `type`: the PR type.
+         * `summary`: the PR summary.
+         * `walkthrough`: the PR walkthrough.
+
+   - Note that when markers are enabled, if the original PR description does not contain any markers, the tool will not alter the description at all.

@@ -5,21 +5,70 @@ The tool can be triggered automatically every time a new PR is [opened](../usage
 /improve
 ```
 
-### Summarized vs committable code suggestions
+## Example usage
 
-The code suggestions can be presented as a single comment (via `pr_code_suggestions.summarize=true`):
+### Manual triggering
+
+Invoke the tool manually by commenting `/improve` on any PR. The code suggestions by default are presented as a single comment:
 
 ![code suggestions as comment](https://codium.ai/images/pr_agent/code_suggestions_as_comment.png){width=512}
 
-Or as a separate commitable code comment for each suggestion:
+To edit [configurations](#configuration-options) related to the improve tool, use the following template:
+```
+/improve --pr_code_suggestions.some_config1=... --pr_code_suggestions.some_config2=...
+```
 
-![imporove](https://codium.ai/images/pr_agent/improve.png){width=512}
+For example, you can choose to present the suggestions as commitable code comments, by running the following command:
+```
+/improve --pr_code_suggestions.commitable_code_suggestions=true
+```
+
+![improve](https://codium.ai/images/pr_agent/improve.png){width=512}
 
 
 Note that a single comment has a significantly smaller PR footprint. We recommend this mode for most cases.
 Also note that collapsible are not supported in _Bitbucket_. Hence, the suggestions are presented there as code comments.
 
-### Extended mode
+### Automatic triggering
+
+To run the `improve` automatically when a PR is opened, define in a [configuration file](https://pr-agent-docs.codium.ai/usage-guide/configuration_options/#wiki-configuration-file):
+```
+[github_app]
+pr_commands = [
+    "/improve",
+    ...
+]
+
+[pr_code_suggestions]
+num_code_suggestions = ...
+...
+```
+
+- The `pr_commands` lists commands that will be executed automatically when a PR is opened.
+- The `[pr_code_suggestions]` section contains the configurations for the `improve` tool you want to edit (if any)
+
+
+
+## Configuration options
+
+!!! example "General options"
+
+    - `num_code_suggestions`: number of code suggestions provided by the 'improve' tool. Default is 4 for CLI, 0 for auto tools.
+    - `extra_instructions`: Optional extra instructions to the tool. For example: "focus on the changes in the file X. Ignore change in ...".
+    - `rank_suggestions`: if set to true, the tool will rank the suggestions, based on importance. Default is false.
+    - `commitable_code_suggestions`: if set to true, the tool will display the suggestions as commitable code comments. Default is false.
+    - `persistent_comment`: if set to true, the improve comment will be persistent, meaning that every new improve request will edit the previous one. Default is false.
+    - `enable_help_text`: if set to true, the tool will display a help text in the comment. Default is true.
+
+!!! example "params for '/improve --extended' mode"
+
+    - `auto_extended_mode`: enable extended mode automatically (no need for the `--extended` option). Default is true.
+    - `num_code_suggestions_per_chunk`: number of code suggestions provided by the 'improve' tool, per chunk. Default is 5.
+    - `rank_extended_suggestions`: if set to true, the tool will rank the suggestions, based on importance. Default is true.
+    - `max_number_of_calls`: maximum number of chunks. Default is 5.
+    - `final_clip_factor`: factor to remove suggestions with low confidence. Default is 0.9.;
+
+## Extended mode
 
 An extended mode, which does not involve PR Compression and provides more comprehensive suggestions, can be invoked by commenting on any PR:
 ```
@@ -36,29 +85,6 @@ auto_extended_mode=true
 Note that the extended mode divides the PR code changes into chunks, up to the token limits, where each chunk is handled separately (might use multiple calls to GPT-4 for large PRs).
 Hence, the total number of suggestions is proportional to the number of chunks, i.e., the size of the PR.
 
-### Configuration options
-
-To edit [configurations](https://github.com/Codium-ai/pr-agent/blob/main/pr_agent/settings/configuration.toml#L66) related to the improve tool (`pr_code_suggestions` section), use the following template:
-```
-/improve --pr_code_suggestions.some_config1=... --pr_code_suggestions.some_config2=...
-```
-
-!!! example "General options"
-
-    - `num_code_suggestions`: number of code suggestions provided by the 'improve' tool. Default is 4 for CLI, 0 for auto tools.
-    - `extra_instructions`: Optional extra instructions to the tool. For example: "focus on the changes in the file X. Ignore change in ...".
-    - `rank_suggestions`: if set to true, the tool will rank the suggestions, based on importance. Default is false.
-    - `summarize`: if set to true, the tool will display the suggestions in a single comment. Default is true.
-    - `persistent_comment`: if set to true, the improve comment will be persistent, meaning that every new improve request will edit the previous one. Default is false.
-    - `enable_help_text`: if set to true, the tool will display a help text in the comment. Default is true.
-
-!!! example "params for '/improve --extended' mode"
-
-    - `auto_extended_mode`: enable extended mode automatically (no need for the `--extended` option). Default is true.
-    - `num_code_suggestions_per_chunk`: number of code suggestions provided by the 'improve' tool, per chunk. Default is 5.
-    - `rank_extended_suggestions`: if set to true, the tool will rank the suggestions, based on importance. Default is true.
-    - `max_number_of_calls`: maximum number of chunks. Default is 5.
-    - `final_clip_factor`: factor to remove suggestions with low confidence. Default is 0.9.
 
 
 ## Usage Tips
